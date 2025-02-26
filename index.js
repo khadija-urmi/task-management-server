@@ -73,7 +73,7 @@ app.delete('/tasks/:id', async (req, res) => {
   }
 });
 
-//update the staus here
+//update the status here
 app.patch('/tasks/:id', async (req, res) => {
       const id = req.params.id;
       const { status } = req.body; 
@@ -84,6 +84,36 @@ app.patch('/tasks/:id', async (req, res) => {
       const result = await taskCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
+//update the task
+  app.put("/tasks/:id", async (req, res) => {
+  const id = req.params.id;
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res.status(400).send({ message: "Title and description are required." });
+  }
+
+  try {
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $set: {
+        title: title,
+        description: description,  
+      },
+    };
+
+    const result = await taskCollection.updateOne(filter, updateDoc);
+
+    if (result.modifiedCount === 0) {
+      return res.status(404).send({ message: "Task not found" });
+    }
+
+    res.send({ message: "Task updated successfully" });
+  } catch (err) {
+    console.error("Error updating task:", err);
+    res.status(500).send({ message: "Failed to update task" });
+  }
+});
 
   } finally {
    
