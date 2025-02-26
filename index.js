@@ -37,12 +37,12 @@ app.post('/user',async(req,res)=>{
 app.post('/tasks',async(req,res)=>{
   const task = req.body;
   const result = await taskCollection.insertOne(task);
-  const filter ={_id: new ObjectId(result.insertedId)};
+  //const filter ={_id: new ObjectId(result.insertedId)};
 
-  const updateDoc = { $inc: {order: 1} };
-  const updateResult = await taskCollection.updateOne(filter, updateDoc);
+  // const updateDoc = { $inc: {order: 1} };
+  // const updateResult = await taskCollection.updateOne(filter, updateDoc);
 
-  res.send({ result: result, updateResult: updateResult });
+  res.send(result);
 })
 
 //get all task
@@ -50,6 +50,40 @@ app.get('/tasks',async(req,res)=>{
   const result = await taskCollection.find().toArray();
   res.send(result)
 })
+
+//get only 1 userEmail task
+app.get('/tasks',async(req,res)=>{
+  const userEmail = req.params.email;
+  const result = await taskCollection.findOne(userEmail);
+  res.send(result)
+})
+
+//delete task
+app.delete('/tasks/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await taskCollection.deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      return res.status(404).send({ message: "Task not found" });
+    }
+    res.send({ message: "Task deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    res.status(500).send({ message: "Failed to delete task" });
+  }
+});
+
+//update the staus here
+app.patch('/tasks/:id', async (req, res) => {
+      const id = req.params.id;
+      const { status } = req.body; 
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: { status }, 
+      };
+      const result = await taskCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
 
   } finally {
    
