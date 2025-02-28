@@ -5,7 +5,17 @@ const cors = require("cors");
 
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "http://cute-adjustment.surge.sh",
+    "https://my-tasks-manager-server.vercel.app",
+  ],
+  methods: ["GET", "POST", "PATCH", "DELETE"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
