@@ -44,10 +44,10 @@ async function run() {
     });
 
     //get only 1 userEmail task
-    app.get("/tasks", async (req, res) => {
-      const userEmail = req.params.email;
-      console.log(userEmail);
-      const result = await taskCollection.findOne(userEmail);
+    app.get("/tasks/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await taskCollection.find(query).toArray();
       res.send(result);
     });
 
